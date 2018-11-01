@@ -44,19 +44,40 @@ To extract CDSs:
 
 ###Description of the headline of the output file: 
 
+The output file includes all columns of the input .map file and added a few additional columns:
+
+###The columns of the input .map file reported by mapgd
 Sca: scaffold      
 Pos: Position
-GROUP: group used for plotting 
 Ref: reference
 Maj: Major type
 Min: Minor type
-P:  MAF
-Poly_LR: Polymorphic likelihood ratio
-Het_Chi: M:m test Chi-square
-Cov: Coverage
-Pi=2*P(1-P)
-H: Heterozygote (Mm) frequency report by mapgd
-F: Inbreeding coefficient report by mapgd
+Cov: Coverage depth
+MJ_FREQ: Major allele frequency
+VR_FREQ: Variant allele frequency
+ERROR: maximum likelihood error rate 
+NULL_ER: error rate assuming monomorphism
+NULL_ER2:  error rate assuming monomorphism 2
+F_STAT：inbreeding coefficient
+MM_FREQ: estimated frequency of the major major genotype
+Mm_FREQ: estimated frequency of the major minor genotype (H)
+mm_FREQ: estimated frequency of the minor minor genotype
+HETERO: heterozygosity of a site
+PLR:  polymorphic likelihood ratio: log likelihood ratio of best fit polymorphic/monomorphic
+HWE_LR: log likelihood ratio of best fit/Hardy–Weinberg equilibrium
+GOF	: goodness of fit value
+EF_CHRM: the effective number of chromosomes at a site
+IND_INC: number of individuals used in a calculatio
+IND_CUT: number of individuals excluded from a calculation 
+REF_BIAS: chi square of M:m bias
+P_REF_BS: probability of M:m bias
+BEST_LL: likelihood of best fit polymorphic
+
+### additional columns:
+GROUP: a reserved column (useful for grouping and plotting)
+P: minor allele frequency (MAF)
+HLR: M:m ratio test Chi-square for all heterozygotes
+Pi: heterozygosity: Pi=2*P(1-P)
 Fis: Inbreeding coefficient (computed)
 
 Note:
