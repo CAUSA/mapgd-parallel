@@ -40,43 +40,67 @@ public static void main(String[] args)
 	String [] b=new String [30];
 	String [] CloneIDs=new String [100];
 	int [][] quarters=new int [100][4];
-	double P =0.0; //gene freq (pi)
-	double pi =0.0; //gene freq (pi)
-	double Q =0.0; //gene freq (qi)
-	double H =0.0; //Hetero freq (pi)
-	double F =0.0; // Inbreeding Coefficient estimate (Fis) 
-	String group="";
+	double P = 0.0; //gene freq (pi)
+	double pi = 0.0; //gene freq (pi)
+	double Q = 0.0; //gene freq (qi)
+	double H = 0.0; //Hetero freq (pi)
+	double F = 0.0; // Inbreeding Coefficient estimate (Fis) 
+
 	String Ref ="";
 	String Maj ="";
 	String Min ="";
-	int    COV = 0 ; //Cov
-	double MJ_FREQ =0.0; // 
-	double VR_FREQ =0.0; // 
-	double ERROR =0.0; // 
-	double NULL_ER =0.0; // 
-	double NULL_ER2 =0.0; // 
-	double F_STAT =0.0; // 
-	double MM_FREQ =0.0; // 
-	double Mm_FREQ =0.0; // 
-	double mm_FREQ =0.0; // 
-	double HETERO =0.0; // 
-	double PLR =0.0; // 
-	double HWE_LR =0.0; // 
-	double GOF =0.0; // 
-	double EF_CHRM =0.0; // 
-	double IND_INC =0.0; // 
-	double IND_CUT =0.0; // 
-	double BEST_LL =0.0; // 
-	double HLR =0.0;
+	String CovStr	     ="";
+	String MJ_FREQstr	 ="";
+	String VR_FREQstr	 ="";
+	String ERRORstr	     ="";
+	String NULL_ERstr	 ="";
+	String NULL_ER2str	 ="";
+	String F_STATstr	 ="";
+	String MM_FREQstr	 ="";
+	String Mm_FREQstr	 ="";
+	String mm_FREQstr	 ="";
+	String HETEROstr	 ="";
+	String PLRstr		 ="";
+	String HWE_LRstr	 ="";
+	String GOFstr		 ="";
+	String EF_CHRMstr	 ="";
+	String IND_INCstr	 ="";
+	String IND_CUTstr	 ="";
+	String REF_BIASstr 	 ="";
+	String P_REF_BSstr 	 ="";
+	String BEST_LLstr	 ="";
+
+	int    Cov = 0 ; //Cov
+	double MJ_FREQ = 0.0; // 
+	double VR_FREQ = 0.0; // 
+	double ERROR = 0.0; // 
+	double NULL_ER = 0.0; // 
+	double NULL_ER2 = 0.0; // 
+	double F_STAT = 0.0; // 
+	double MM_FREQ = 0.0; // 
+	double Mm_FREQ = 0.0; // 
+	double mm_FREQ = 0.0; // 
+	double HETERO = 0.0; // 
+	double PLR = 0.0; // 
+	double HWE_LR = 0.0; // 
+	double GOF = 0.0; // 
+	double EF_CHRM = 0.0; // 
+	double IND_INC = 0.0; // 
+	double IND_CUT = 0.0; // 
+	double REF_BIAS= 0.0;
+	double P_REF_BS= 0.0;
+	double BEST_LL = 0.0; // 
+	double HLR = 0.0;
 	int isPolymorphic=0;
+	
+	String group="";
 	String Pstr ="";
-	String PLRstr ="";
 	String HLRstr ="";
-	String COVstr ="";
 	String Hstr ="";
-	String pistr ="";
-	String Fisstr =""; // Inbreeding Coefficient estimate
-	String F_Str ="";//mapgd output
+	String piStr ="";
+	String FisStr =""; // Inbreeding Coefficient estimate
+	
+
 try
 {	
 	FilMapPro FAobj=new FilMapPro();
@@ -104,12 +128,11 @@ try
 	
 	BufferedReader brPro = new BufferedReader(new InputStreamReader(new BufferedInputStream(new FileInputStream(new File(FilMapPro.ProFile))),"utf-8"),5*1024*1024); // reading file using 5M buffer
 	
-	String fFilter="e-"+FilMapPro.Error1+"-E-"+FilMapPro.Error2+"-C-"+FilMapPro.MinC+"-"+FilMapPro.MaxC+"-Fis.txt";	
+	String fFilter="e-"+FilMapPro.Error1+"-E-"+FilMapPro.Error2+"-C-"+FilMapPro.MinC+"-"+FilMapPro.MaxC;	
 	String fFileName = FilMapPro.MapFile.substring(0, FilMapPro.MapFile.indexOf(".map.map"));
-	String fAll = fFileName+".All."+fFilter;
-	String fPolymorphic = fFileName+".Polymorphic."+fFilter;
-
-	//String fDimorphic = fFileName+".Dimorphic."+fFilter;
+	String fAll = fFileName+".All-"+fFilter+"-Fis.txt";
+	String fPolymorphic = fFileName+".Polymorphic-"+fFilter+"-Fis.txt";
+	//String fDimorphic = fFileName+".Dimorphic-"+fFilter+"-Fis.txt";
 	
 	
 	BufferedWriter bwfAll = new BufferedWriter(new OutputStreamWriter( new BufferedOutputStream(new FileOutputStream(new File(fAll))),"utf-8"),1024*1024); // Writing file using 1M buffer 
@@ -119,19 +142,39 @@ try
 	//BufferedWriter bwfDimorphic = new BufferedWriter(new OutputStreamWriter( new BufferedOutputStream(new FileOutputStream(new File(fDimorphic))),"utf-8"),1024*1024); // Writing file using 1M buffer 
 	
 	String headline="";
+	
 	headline+="Sca\t"; 
 	headline+="Pos\t"; 
-	headline+="GROUP\t"; 
-	headline+="Ref\t"; 
-	headline+="Maj\t"; 
-	headline+="Min\t"; 
-	headline+="P\t";  
-	headline+="Poly_LR\t";  
-	headline+="Het_LR\t";  
-	headline+="Cov\t";  
-	headline+="pi\t"; 
-	headline+="H\t";  
-	headline+="F\t";  
+	headline+="Ref\t";
+	headline+="Maj\t";
+	headline+="Min\t";
+	headline+="Cov\t" ;  
+	headline+="MJ_FREQ\t" ; 
+	headline+="VR_FREQ\t" ; 
+	headline+="ERROR\t" ; 
+	headline+="NULL_ER\t" ; 
+	headline+="NULL_ER2\t" ; 
+	headline+="F_STAT\t" ; 
+	headline+="MM_FREQ\t" ; 
+	headline+="Mm_FREQ\t" ; 
+	headline+="mm_FREQ\t" ; 
+	headline+="HETERO\t" ; 
+	headline+="PLR\t" ; 
+	headline+="HWE_LR\t" ; 
+	headline+="GOF\t" ; 
+	headline+="EF_CHRM\t" ; 
+	headline+="IND_INC\t" ; 
+	headline+="IND_CUT\t" ; 
+	headline+="REF_BIAS\t" ; 
+	headline+="P_REF_BS\t" ; 
+	headline+="BEST_LL\t" ; 
+	          
+//additional columns
+	headline+="group\t";			
+	headline+="P\t";
+	headline+="HLR\t";
+	headline+="pi\t";
+	headline+="H\t";
 	headline+="Fis\n";
 
 	bwfAll.write(headline);
@@ -149,7 +192,7 @@ try
 		InputErrors++;
 		if(lineMap.indexOf("VERSION:0.4.3")<0)
 		{			
-			System.out.println("Your mapgd version is low. The .map file must be produced by mapgd VERSION 0.4.3x!\n");
+			System.out.println("Your mapgd version is out of date. The .map file must be produced by mapgd VERSION 0.4.3x!\n");
 			InputErrors++;
 		}
 	}
@@ -226,10 +269,11 @@ try
 						
 			for(int k=0;k<b.length;k++)
 			{
-				if (b[k]==null) 				{b[k]="0.0000";};
-				if (b[k].trim().isEmpty()) 		{b[k]="0.0000";};
-				if (b[k].trim().equals(".")) 	{b[k]="0.0000";};
-				if (b[k].trim().equals("inf")) 	{b[k]="0.0000";};
+				if (b[k]==null) 				{b[k]="0.0";};
+				if (b[k].trim().isEmpty()) 		{b[k]="0.0";};
+				if (b[k].trim().equals(".")) 	{b[k]="0.0";};
+				if (b[k].trim().equals("inf")) 	{b[k]="0.0";};
+				if (b[k].trim().equals("-nan")) {b[k]="0.0";};
 				//if (nTotal%1000000==0) {System.out.print(b[k]+"\t");}
 			}
 			
@@ -241,12 +285,33 @@ try
 			
 			isPolymorphic=0;
 
-			if (b.length==23) 
+			if (b.length==25) 
 			{
-				Ref 		= b[2] ;                    
-				Maj 		= b[3] ;                    
-				Min 		= b[4] ;                    
-				COV			= Integer.parseInt(b[5]) ;  
+				Ref 		= b[2];                    
+				Maj 		= b[3];                    
+				Min 		= b[4];                    
+				CovStr		= b[5];
+				MJ_FREQstr	= b[6];
+				VR_FREQstr	= b[7];
+				ERRORstr	= b[8];
+				NULL_ERstr	= b[9];
+				NULL_ER2str	= b[10];
+				F_STATstr	= b[11];
+				MM_FREQstr	= b[12];
+				Mm_FREQstr	= b[13];
+				mm_FREQstr	= b[14];
+				HETEROstr	= b[15];
+				PLRstr		= b[16];
+				HWE_LRstr	= b[17];
+				GOFstr		= b[18];
+				EF_CHRMstr	= b[19];
+				IND_INCstr	= b[20];
+				IND_CUTstr	= b[21];
+				REF_BIASstr = b[22];
+				P_REF_BSstr = b[23];
+				BEST_LLstr	= b[24];
+
+				Cov			= Integer.parseInt(b[5]) ;  
 				MJ_FREQ 	= Double.parseDouble(b[6] );
 				VR_FREQ 	= Double.parseDouble(b[7] );
 				ERROR 		= Double.parseDouble(b[8] );
@@ -263,7 +328,9 @@ try
 				EF_CHRM 	= Double.parseDouble(b[19]);
 				IND_INC 	= Double.parseDouble(b[20]);
 				IND_CUT 	= Double.parseDouble(b[21]);
-				BEST_LL 	= Double.parseDouble(b[22]);
+				REF_BIAS 	= Double.parseDouble(b[22]);
+				P_REF_BS 	= Double.parseDouble(b[23]);
+				BEST_LL 	= Double.parseDouble(b[24]);
 				
 				if (MJ_FREQ==0){MJ_FREQ=1.0;}//Major frequency
 				
@@ -272,14 +339,13 @@ try
 				H = Mm_FREQ; //hetero genotype (Mm) frequency estimate
 				
 				if (pi>0.0){F=1-H/pi;}//Inbreeding coefficient (Fis)
-				else{F=0.0;} 
-			
+				else{F= 0.0;} 
 			
 				// Test total Major:Minor ratio in heterozygotes
 				int IndMaj="ACGT".indexOf(Maj);
 				int IndMin="ACGT".indexOf(Min);
-				int M=0;
-				int N=0;
+				int M=0; //Count of major type reads
+				int N=0; //Count of minor type reads
 				HLR=9999.9;
 				if(IndMaj>=0&&IndMaj<=3&&IndMin>=0&&IndMin<=3)
 				{	
@@ -291,33 +357,24 @@ try
 							N+=quarters[j][IndMin];
 						}
 					}	
-					double m=(M+N)/2;
+					double m=(M+N)/2; //mean of the count of M and N
 					HLR = ((M-m)*(M-m)+(N-m)*(N-m))/m;
 				}
 				
 				if(P>0.0) 
 				{
 					nPolymorphic++;
-					if(PLR<FilMapPro.MinPLR)
-					{
-						nInSigPolymorphic++;
-						if(COV<FilMapPro.MinC){nLowCov++;}
-						if(COV>FilMapPro.MaxC){nHighCov++;}
-						if(COV>=FilMapPro.MinC&&COV<=FilMapPro.MaxC)
-						{
-							nGoodCov++;
-							if(HLR>=FilMapPro.MinHLR)
-							{
-								nMmBiased++;
-								if(F<=-0.33){nF1++;} else {nF2++;}
-							}
-						}
-					}	
+					if(Cov<FilMapPro.MinC){nLowCov++;}
+					if(Cov>FilMapPro.MaxC){nHighCov++;}
+					if(Cov>=FilMapPro.MinC&&Cov<=FilMapPro.MaxC){nGoodCov++;}
+					if(HLR>=FilMapPro.MinHLR){nMmBiased++;}
+					if(F<=-0.33){nF1++;} else {nF2++;}
+					if(PLR<FilMapPro.MinPLR){nInSigPolymorphic++;}	
 					else
 					{
-						if(COV<FilMapPro.MinC){nLowCovSig++;}
-						if(COV>FilMapPro.MaxC){nHighCovSig++;}
-						if(COV>=FilMapPro.MinC&&COV<=FilMapPro.MaxC)
+						if(Cov<FilMapPro.MinC){nLowCovSig++;}
+						if(Cov>FilMapPro.MaxC){nHighCovSig++;}
+						if(Cov>=FilMapPro.MinC&&Cov<=FilMapPro.MaxC)
 						{
 							nGoodCovSig++;
 							if(HLR>=FilMapPro.MinHLR)
@@ -327,8 +384,8 @@ try
 							}
 						}
 					}
-				}								
-				if(P>0.0&&PLR>=FilMapPro.MinPLR&&HLR<FilMapPro.MinHLR&&COV>=FilMapPro.MinC&&COV<=FilMapPro.MaxC) 
+				}				
+				if(P>0.0&&PLR>=FilMapPro.MinPLR&&HLR<FilMapPro.MinHLR&&Cov>=FilMapPro.MinC&&Cov<=FilMapPro.MaxC) 
 				{
 					isPolymorphic=1;
 					nSigPolymorphic++;
@@ -340,36 +397,52 @@ try
 					//pi	= 0.0;
 					//H 	= 0.0;
 					//F_STAT= 0.0;
-				} 
+				}
+				group	= String.valueOf(Math.round(P*100)/100.0);
 				Pstr	= String.valueOf(Math.round(P*10000)/10000.0);
-				PLRstr	= String.valueOf(Math.round(PLR*10000)/10000.0);
 				HLRstr	= String.valueOf(Math.round(HLR*10000)/10000.0);
 				if(HLRstr.equals("9999.9")){HLRstr=".";}
-				COVstr	= String.valueOf(Math.round(COV*10000)/10000.0);
-				pistr	= String.valueOf(Math.round(pi*10000)/10000.0);
+				piStr	= String.valueOf(Math.round(pi*10000)/10000.0);
 				Hstr	= String.valueOf(Math.round(H*10000)/10000.0);
-				F_Str	= String.valueOf(Math.round(F_STAT*10000)/10000.0);
-				Fisstr	= String.valueOf(Math.round(F*10000)/10000.0);
-				group	= String.valueOf(Math.round(P*100)/100.0);
+				FisStr	= String.valueOf(Math.round(F*10000)/10000.0);
 			}
 			
+		// columns in the original .map file
 			OStr+=S+"\t";
 			OStr+=L+"\t";
-			OStr+=group+"\t";			
 			OStr+=Ref+"\t";
 			OStr+=Maj+"\t";
 			OStr+=Min+"\t";
-			
+			OStr+=CovStr+"\t" ;  
+			OStr+=MJ_FREQstr+"\t" ; 
+			OStr+=VR_FREQstr+"\t" ; 
+			OStr+=ERRORstr	+"\t" ; 
+			OStr+=NULL_ERstr+"\t" ; 
+			OStr+=NULL_ER2str+"\t" ; 
+			OStr+=F_STATstr	+"\t" ; 
+			OStr+=MM_FREQstr+"\t" ; 
+			OStr+=Mm_FREQstr+"\t" ; 
+			OStr+=mm_FREQstr+"\t" ; 
+			OStr+=HETEROstr	+"\t" ; 
+			OStr+=PLRstr	+"\t" ; 
+			OStr+=HWE_LRstr	+"\t" ; 
+			OStr+=GOFstr	+"\t" ; 
+			OStr+=EF_CHRMstr+"\t" ; 
+			OStr+=IND_INCstr+"\t" ; 
+			OStr+=IND_CUTstr+"\t" ; 
+			OStr+=REF_BIASstr+"\t" ; 
+			OStr+=P_REF_BSstr+"\t" ; 
+			OStr+=BEST_LLstr+"\t" ; 
+		
+		//additional columns
+			OStr+=group+"\t";			
 			OStr+=Pstr+"\t";
-			OStr+=PLRstr+"\t";
 			OStr+=HLRstr+"\t";
-			OStr+=COVstr+"\t";
-			OStr+=pistr+"\t";
+			OStr+=piStr+"\t";
 			OStr+=Hstr+"\t";
-			OStr+=F_Str+"\t";
-			OStr+=Fisstr+"\n";
+			OStr+=FisStr+"\n";
 			
-			OStr=OStr.replaceAll("0.0\t", ".\t");
+			OStr=OStr.replaceAll("\t0.0\t", "\t.\t");
 			
 			bwfAll.write(OStr);
 			
@@ -388,7 +461,7 @@ try
 	System.out.print(fPolymorphic+"\n");
 	//System.out.print(fDimorphic+"\n");
 	
-	String fOut = fFileName+fFilter+"out.txt";
+	String fOut = fFileName+"-"+fFilter+"-out.txt";
 	BufferedWriter bwfOut = new BufferedWriter(new OutputStreamWriter( new BufferedOutputStream(new FileOutputStream(new File(fOut))),"utf-8"),10*1024); // Writing file using 1M buffer 
 	
 	bwfOut.write(fPolymorphic+"\n");
