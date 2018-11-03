@@ -129,7 +129,7 @@ try
 catch(Exception e)
 {
 	System.out.println("\nThis program is to ExtractCDSs\n"); 
-	System.out.println("\nUsage: Java -cp ./ ExtractCDSs\n"); 
+	System.out.println("\nUsage: Java -cp ./ ExtractCDSs <MapFile> <OutputDir>\n"); 
 	System.out.println(e);
 	e.printStackTrace();
 }
@@ -139,12 +139,6 @@ public static int countOf (String s, String c) {
 }
 }
 /*
-======================================================================
-ExtractCDSs
-
-Usage: ExtractCDSs using Gene Frequency Data and gene annotation file:
- 
-Java -cp ./ ExtractCDSs <Map-GeneFreqData> <GFF> > output
 =====================================================================
 Written by:                   
 Xiaolong Wang @ Ocean University of China 
