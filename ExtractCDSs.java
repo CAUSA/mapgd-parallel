@@ -28,6 +28,14 @@ try
 	int [] Start = new int[Gn]; //Gene start 
 	int [] End = new int[Gn]; //Gene end 
 
+	for (int g=1;g<Gn;g++) //Is a coding sequence
+	{
+			Reference[g]="";
+			Major[g]="";
+			Minor[g]="";
+			ps[g]="";
+			qs[g]="";
+	}
 	System.out.println("Reading annotated map files:\n");
 	int i=0;
 	String lineMap="";
@@ -54,21 +62,39 @@ try
 	
 			//Minor allele frequencies (MAF)
 			if(b[31].equals(".")){b[31]="0.0";	}	
-			double P = Double.parseDouble(b[31]); //MAF:	
-			String p=String.valueOf(Math.round(P*10000)/10000.0);
-			String q=String.valueOf(Math.round((1-P)*10000)/10000.0);
+			double MAF = Double.parseDouble(b[31]); //MAF:	
+			String p=String.valueOf(Math.round((1-MAF)*10000)/10000.0);
+			String q=String.valueOf(Math.round(MAF*10000)/10000.0);
 					
 			if (Ref.equals("N")) {Ref=Maj;}
 			if (Ref.equals("N")) {Ref=Min;}
 			if (Maj.equals("N")) {Maj=Ref;}
 			if (Min.equals("N")) {Min=Ref;}
 				
-			Reference[g]=Reference[g]+" "+Ref;
+			if(Strand[g].equals("+"))
+			{
+				Reference[g]=Reference[g]+" "+Ref;
+				Major[g]=Major[g]+" "+Maj;
+				Minor[g]=Minor[g]+" "+Min;
+				ps[g]=ps[g]+" "+p;
+				qs[g]=qs[g]+" "+q;
+			}
+			else
+			{
+				int N1="TAGCN".indexOf(Ref);
+				int N2="TAGCN".indexOf(Maj);
+				int N3="TAGCN".indexOf(Min);
+				Ref="ATGCN".substring(N1, N1+1); //compliment
+				Maj="ATGCN".substring(N2, N2+1); //compliment
+				Min="ATGCN".substring(N3, N3+1); //compliment
+				
+				Reference[g]=Ref+" "+Reference[g]; //Reverse
+				Major[g]=Maj+" "+Major[g];//Reverse
+				Minor[g]=Min+" "+Minor[g];//Reverse
+				ps[g]=p+" "+ps[g];//Reverse
+				qs[g]=q+" "+qs[g];//Reverse
+			}
 			if(Reference[g].length()==1){Start[g]=L;}
-			Major[g]=Major[g]+" "+Maj;
-			Minor[g]=Minor[g]+" "+Min;
-			ps[g]=ps[g]+" "+p;
-			qs[g]=qs[g]+" "+q;
 		}
  	}
 
@@ -77,7 +103,7 @@ try
 	int Gn1=0;
 	for (int g=1;g<Gn;g++) //Is a coding sequence
 	{
-		if (Reference[g].length()>0)
+		if (!Reference[g].isEmpty())
 		{
 			Gn1++;
 			String CDSName="Gene"+g;
@@ -89,7 +115,7 @@ try
 			
 			End[g]=Start[g]+Reference[g].length()-1;
 			
-			bw3.write(">"+CDSName+"-"+Strand[g]+"-"+Start[g]+"-"+End[g]+"\n"); 	
+			bw3.write(">"+CDSName+"-"+Start[g]+"-"+End[g]+"-("+Strand[g]+")\n"); 
 			bw3.write(Reference[g]+"\n"); 	
 			bw3.write(Major[g]+"\n"); 	
 			bw3.write(Minor[g]+"\n"); 	
