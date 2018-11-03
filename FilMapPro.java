@@ -589,8 +589,15 @@ public static int CheckInputArgs(String argstr)
 		}
 		else
 		{
-			System.out.print("The error rate must be either 0.05 or 0.01.\n");
-			InputErrors++;
+			if (FilMapPro.Error1.indexOf("0.001")>=0)
+			{
+				FilMapPro.MinPLR = 13.82; 
+			}
+			else
+			{
+				System.out.print("The error rate must be either 0.05 or 0.01.\n");
+				InputErrors++;
+			}
 		}
 	}
 	//System.out.print("Polymorphic likelyhood ratio >="+FilMapPro.MinPLR+"\n ");
@@ -608,8 +615,15 @@ public static int CheckInputArgs(String argstr)
 		}
 		else
 		{
-			System.out.print("The error rate must be either 0.05 or 0.01.\n");
-			InputErrors++;
+			if (FilMapPro.Error2.indexOf("0.001")>=0)
+			{
+				FilMapPro.MinHLR = 10.83; 
+			}
+			else
+			{
+				System.out.print("The error rate must be either 0.05 or 0.01.\n");
+				InputErrors++;
+			}
 		}
 	}
 	
@@ -692,12 +706,6 @@ public static int CheckInputArgs(String argstr)
 }
 /*
 ======================================================================
-FilMapPro
-
-Usage: FilMapPro using Gene Frequency Data and gene annotation file:
- 
-java -cp ./ FilMapPro <Error> <FilMapPro.MinC> <FilMapPro.MaxC> <FilMapPro.WD> <FilMapPro.MapFile> <FilMapPro.ProFile>
-=====================================================================
 Written by: 
 Xiaolong Wang @ Ocean University of China 
 email: xiaolong@ouc.edu.cn
