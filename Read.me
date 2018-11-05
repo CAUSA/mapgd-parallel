@@ -1,7 +1,7 @@
 
 #### Filtering Map Using FilMapPro
 
-Program FilMapPro.java is used for filtering the sites by coverage, polymorphic likelihood ratio test and heterozygotes M:m ratio chi-square test. 
+Program FilMapPro.java is used for filtering the sites by population coverage, polymorphic likelihood ratio (PLR) and heterozygotes M:m ratio chi-square test. 
 
 After downloading, cd to the directory and type the following command:
 
@@ -12,14 +12,14 @@ javac -cp ./ FilMapPro.java
 java -cp ./ FilMapPro <-e e> <-E E> <-c c> <-C C> <-d WD> <-m MapFile> <-p ProFile>
 
 Note:
-e: Error rate for polymorphic likelihood ratio (PLR) test. The error rate  can be 0.05, 0.01 or 0.001. For PLR test, the degree of freedom is 2, the corresponding Chi-squre threshold (Threshold-e) is 5.99, 9.21 and 13.82;
-E: Error rate for heterozygotes M:m ratio chi-square tests. The error rate  can be 0.05, 0.01 or 0.001. For M:m ratio chi-square test, the degree of freedom is 1, the corresponding Chi-squre threshold (Threshold-E) is 3.84, 6.63, 10.83;
+e: the confidence interval for polymorphic likelihood ratio (PLR) test. The confidence interval can be 0.05, 0.01 or 0.001. For PLR test, the degree of freedom is 2, the corresponding Chi-squre threshold (Threshold-e) is 5.99, 9.21 and 13.82;
+E: the confidence interval for heterozygotes M:m ratio chi-square tests. The confidence interval can be 0.05, 0.01 or 0.001. For M:m ratio chi-square test, the degree of freedom is 1, the corresponding Chi-squre threshold (Threshold-E) is 3.84, 6.63, 10.83;
 c: Min population total coverage;
 C: Max population total coverage;
 WD: working directory;
 MapFile: .clean.map file name;	
 ProFile: .clean.pro file name;
-Please note that both .clean.map File and .clean.pro file must be produced by mapgd the newest version: 0.4.3x.
+Please note that both .clean.map File and .clean.pro file must be produced by mapgd the newest version (above 0.4.3x).
 
 For example:
 
@@ -39,7 +39,7 @@ After finished runing, the program will produce three output files:
 The output file includes all columns of the input .map file and added a few additional columns:
 
 ###The columns of the input .map file reported by mapgd
-Sca: scaffold;      
+Sca: scaffold; 
 Pos: Position;
 Ref: reference;
 Maj: Major type;
@@ -47,15 +47,15 @@ Min: Minor type;
 Cov: Coverage depth;
 MJ_FREQ: Major allele frequency;
 VR_FREQ: Variant allele frequency;
-ERROR: maximum likelihood error rate; 
-NULL_ER: error rate assuming monomorphism;
-NULL_ER2:  error rate assuming monomorphism 2;
+ERROR: maximum likelihood confidence interval; 
+NULL_ER: confidence interval assuming monomorphism;
+NULL_ER2: confidence interval assuming monomorphism 2;
 F_STAT：inbreeding coefficient reported by mapgd;
 MM_FREQ: estimated frequency of the major/major genotype;
 Mm_FREQ: estimated frequency of the major/minor genotype;
 mm_FREQ: estimated frequency of the minor/minor genotype;
 HETERO: heterozygosity of a site;
-PLR:  polymorphic likelihood ratio: log likelihood ratio of best fit polymorphic/monomorphic;
+PLR: polymorphic likelihood ratio: log likelihood ratio of best fit polymorphic/monomorphic;
 HWE_LR: log likelihood ratio of best fit/Hardy–Weinberg equilibrium;
 GOF	: goodness of fit value;
 EF_CHRM: the effective number of chromosomes at a site;
@@ -74,26 +74,26 @@ H: observed or estimated frequency of heterozygotes (same as Mm_FREQ);
 Fis: computed Inbreeding coefficient, should be same as F_STAT reported by mapgd.
 
 * Note:
- (1) File MapFile.All.map is useful for extracting sequences, such as CDSs, exon, intron, which can be used for downstream analysis, such as computing nucleotide diversity, heterozygosity, dN/dS,  piN/piS, or neutral index. 
+ (1) File MapFile.All.map is useful for extracting sequences, such as CDSs, exon, intron, which can be used for downstream analysis, such as computing nucleotide diversity, heterozygosity, dN/dS, piN/piS, or neutral index. 
  (2) Because mapgd does not check the reference genome sequence and it does not fill in the reference/major/minor sequences that are absent in the input mpileup file but fill them with "Ns" instead, an end user must check the reference genome sequence and fill in the reference/major/minor sequence that are absent in the .map file. 
  
  You may check the reference genome sequence and fill in the reference/major/minor sequence using the following programs:
  
 (1) To creat an annotated .map file using the reference genome sequence and a corresponding GFF file:
-    java -cp ./ CombineRefGFF PA42.4.1.fasta PA42.4.1.GFF > PA42.4.1.Annotated.map
+ java -cp ./ CombineRefGFF PA42.4.1.fasta PA42.4.1.GFF > PA42.4.1.Annotated.map
 	
 (2) To check the reference genome and fill in the reference sequence:
-    java -cp ./ AnnotateFilteredMaps PA42.4.1.Annotated.map MapFile.All.map > MapFile.All.Annotated.map
+ java -cp ./ AnnotateFilteredMaps PA42.4.1.Annotated.map MapFile.All.map > MapFile.All.Annotated.map
 	
 (3) To extract CDSs:
-    java -cp ./ ExtractCDSs MapFile.All.Annotated.map <input/output/DIR>
-    all CDSs will be extracted and saved in the specified input/output/dir in .txt5 format:
+ java -cp ./ ExtractCDSs MapFile.All.Annotated.map <input/output/DIR>
+ all CDSs will be extracted and saved in the specified input/output/dir in .txt5 format:
 	
-        Reference sequence
-        Major sequence
-        Minor sequence
-        Major frequencies 
-        Minor frequencies
+ Reference sequence
+ Major sequence
+ Minor sequence
+ Major frequencies 
+ Minor frequencies
 		
 (4) To comput dN/dS: using these.txt5 files to compute dN/dS by CalculatedNdS.pl, a perl program written by Zhiqiang Ye.
 
