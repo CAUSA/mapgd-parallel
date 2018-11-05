@@ -19,16 +19,16 @@ public static void main(String[] args)
 	int L=0; //Position	
 	int nTotal=0;
 	int nPolymorphic=0;
-	int nGoodSites=0;
+	int nFiltered=0;
 	int nBadSites=0;
 	int nMmBiased=0;
 	int nLowCov=0;
 	int nHighCov=0;
-	int	nGoodCov=0;
+	int	nFilteredCov=0;
 	int nMmBiasedSig=0;
 	int nLowCovSig=0;
 	int nHighCovSig=0;
-	int	nGoodCovSig=0;
+	int	nFilteredCovSig=0;
 	int nF1=0;
 	int nF2=0;
 	int nF3=0;
@@ -91,7 +91,7 @@ public static void main(String[] args)
 	double P_REF_BS= 0.0;
 	double BEST_LL = 0.0; // 
 	double HLR = 0.0;
-	int isGoodSite=0;
+	int isFilteredSite=0;
 	
 	String group="";
 	String Pstr ="";
@@ -130,17 +130,14 @@ try
 	
 	String fFilter="e-"+FilMapPro.Error1+"-E-"+FilMapPro.Error2+"-C-"+FilMapPro.MinC+"-"+FilMapPro.MaxC;	
 	String fFileName = FilMapPro.MapFile.substring(0, FilMapPro.MapFile.indexOf(".map.map"));
-	String fAllSites = fFileName+".All-"+fFilter+".map";
-	String fGoodSites = fFileName+".Polymorphic-"+fFilter+".map";
-	//String fDimorphic = fFileName+".Dimorphic-"+fFilter+".map";
+	String fAllSites = fFileName+".AllSites-"+fFilter+".map";
+	String fFiltered = fFileName+".Filtered-"+fFilter+".map";
 	
 	
-	BufferedWriter bwfAllSitesSites = new BufferedWriter(new OutputStreamWriter( new BufferedOutputStream(new FileOutputStream(new File(fAllSites))),"utf-8"),1024*1024); // Writing file using 1M buffer 
+	BufferedWriter bwfAllSites = new BufferedWriter(new OutputStreamWriter( new BufferedOutputStream(new FileOutputStream(new File(fAllSites))),"utf-8"),1024*1024); // Writing file using 1M buffer 
 		
-	BufferedWriter bwfGoodSites = new BufferedWriter(new OutputStreamWriter( new BufferedOutputStream(new FileOutputStream(new File(fGoodSites))),"utf-8"),1024*1024); // Writing file using 1M buffer 
-		
-	//BufferedWriter bwfDimorphic = new BufferedWriter(new OutputStreamWriter( new BufferedOutputStream(new FileOutputStream(new File(fDimorphic))),"utf-8"),1024*1024); // Writing file using 1M buffer 
-	
+	BufferedWriter bwfFiltered = new BufferedWriter(new OutputStreamWriter( new BufferedOutputStream(new FileOutputStream(new File(fFiltered))),"utf-8"),1024*1024); // Writing file using 1M buffer 
+			
 	String headline="";
 	
 	headline+="Sca\t"; 
@@ -177,8 +174,8 @@ try
 	headline+="H\t";
 	headline+="Fis\n";
 
-	bwfAllSitesSites.write(headline);
-	bwfGoodSites.write(headline);
+	bwfAllSites.write(headline);
+	bwfFiltered.write(headline);
 	lineMap=brMap.readLine();
 	linePro=brPro.readLine();
 	
@@ -283,7 +280,7 @@ try
 			S = Integer.parseInt(b[0].substring(9)); //S
 			L = Integer.parseInt(b[1]); //Position
 			
-			isGoodSite=0;
+			isFilteredSite=0;
 
 			if (b.length==25) 
 			{
@@ -366,7 +363,7 @@ try
 					nPolymorphic++;
 					if(Cov<FilMapPro.MinC){nLowCov++;}
 					if(Cov>FilMapPro.MaxC){nHighCov++;}
-					if(Cov>=FilMapPro.MinC&&Cov<=FilMapPro.MaxC){nGoodCov++;}
+					if(Cov>=FilMapPro.MinC&&Cov<=FilMapPro.MaxC){nFilteredCov++;}
 					if(HLR>=FilMapPro.MinHLR){nMmBiased++;}
 					if(F<=-0.33){nF1++;} else {nF2++;}
 					if(PLR<FilMapPro.MinPLR){nBadSites++;}	
@@ -376,7 +373,7 @@ try
 						if(Cov>FilMapPro.MaxC){nHighCovSig++;}
 						if(Cov>=FilMapPro.MinC&&Cov<=FilMapPro.MaxC)
 						{
-							nGoodCovSig++;
+							nFilteredCovSig++;
 							if(HLR>=FilMapPro.MinHLR)
 							{
 								nMmBiasedSig++;
@@ -387,8 +384,8 @@ try
 				}				
 				if(P>0.0&&PLR>=FilMapPro.MinPLR&&HLR<FilMapPro.MinHLR&&Cov>=FilMapPro.MinC&&Cov<=FilMapPro.MaxC) 
 				{
-					isGoodSite=1;
-					nGoodSites++;
+					isFilteredSite=1;
+					nFiltered++;
 				}
 				else
 				{
@@ -444,38 +441,37 @@ try
 			
 			OStr=OStr.replaceAll("\t0.0\t", "\t.\t");
 			
-			bwfAllSitesSites.write(OStr);
+			bwfAllSites.write(OStr);
 			
-			if (isGoodSite>0)
+			if (isFilteredSite>0)
 			{
-				bwfGoodSites.write(OStr);	
+				bwfFiltered.write(OStr);	
 			}
 		}
 	} //end while
 	
-	bwfAllSitesSites.close();
-	bwfGoodSites.close();
+	bwfAllSites.close();
+	bwfFiltered.close();
 	
 	System.out.print("Results were saved in files:\n");
 	System.out.print(fAllSites+"\n");
-	System.out.print(fGoodSites+"\n");
-	//System.out.print(fDimorphic+"\n");
+	System.out.print(fFiltered+"\n");
 	
 	String fOut = fFileName+"-"+fFilter+"-out.txt";
 	BufferedWriter bwfOut = new BufferedWriter(new OutputStreamWriter( new BufferedOutputStream(new FileOutputStream(new File(fOut))),"utf-8"),10*1024); // Writing file using 1M buffer 
 	
-	bwfOut.write(fGoodSites+"\n");
+	bwfOut.write(fFiltered+"\n");
 	bwfOut.write("All sites: "+nTotal+"\n");
 	bwfOut.write("Polymorphic (MAF>0.0): "+nPolymorphic+"\n");
-	bwfOut.write("Good Sites:"+nGoodSites+"\n");
-	bwfOut.write("Good sites: Good coverage (Cov="+FilMapPro.MinC+"-"+FilMapPro.MaxC+"), significantly polymorphic(PLR>="+FilMapPro.MinPLR+") and not M/m biased (M:m chi-square<"+FilMapPro.MinHLR+"\n");
+	bwfOut.write("Filtered Sites:"+nFiltered+"\n");
+	bwfOut.write("Filtered sites: Filtered coverage (Cov="+FilMapPro.MinC+"-"+FilMapPro.MaxC+"), significantly polymorphic(PLR>="+FilMapPro.MinPLR+") and not M/m biased (M:m chi-square<"+FilMapPro.MinHLR+"\n");
 	bwfOut.write("Bad Sites: "+nBadSites+"\n");
 	bwfOut.write("Cov<"+FilMapPro.MinC+"&significant: "+nLowCovSig+"\n");
 	bwfOut.write("Cov>"+FilMapPro.MaxC+"&significant: "+nHighCovSig+"\n");
 	bwfOut.write("Cov<"+FilMapPro.MinC+"&insignificant: "+nLowCov+"\n");
 	bwfOut.write("Cov>"+FilMapPro.MaxC+"&insignificant: "+nHighCov+"\n");
-	bwfOut.write("Cov="+FilMapPro.MinC+"-"+FilMapPro.MaxC+"&significant: "+nGoodCovSig+"\n");
-	bwfOut.write("Cov="+FilMapPro.MinC+"-"+FilMapPro.MaxC+"&insignificant: "+nGoodCov+"\n");
+	bwfOut.write("Cov="+FilMapPro.MinC+"-"+FilMapPro.MaxC+"&significant: "+nFilteredCovSig+"\n");
+	bwfOut.write("Cov="+FilMapPro.MinC+"-"+FilMapPro.MaxC+"&insignificant: "+nFilteredCov+"\n");
 	bwfOut.write("M/m biased&significant: "+nMmBiasedSig+"\n");	
 	bwfOut.write("M/m biased&insignificant: "+nMmBiased+"\n");	
 	bwfOut.write("F>-0.33: "+nF3+"\n");
