@@ -34,7 +34,7 @@ After finished runing, the program will produce three output files:
 (1). MapFile-out.txt
 (2). MapFile.Filtered.map
 (3). MapFile.AllSites.map
-
+Note:
 (1). MapFile-out.txt: shows the number of sites that are kept/removed in the filtering process.
 (2). MapFile.Filtered.map: contains filtered sites (exclude zeros), i.e., c<coverage=C, significant polymorphic (PLR>=Threshold-e) and not M:m biased (HLR<Threshold-E). This file is useful for downstream data analysis, such as Fis analysis.
 (3). MapFile.AllSites.map: contains all sites of the map (including zeros) (*see note in the end).
@@ -76,10 +76,10 @@ P: minor allele frequency (MAF);
 HLR: heterozygotes likelihood ratio (M:m ratio Chi-square for all heterozygotes);
 Pi: heterozygosity, Pi=2*P(1-P);
 H: observed or estimated frequency of heterozygotes (same as Mm_FREQ);
-Fis: computed Inbreeding coefficient, should be same as F_STAT reported by mapgd.
+Fis: computed Inbreeding coefficient, is the same as F_STAT reported by mapgd but is rewritten as 0.0 if the site is M:m-biased (P_REF_BS>E).
 
 * Note:
- (1) File MapFile.All.map is useful for extracting sequences, such as CDSs, exon, intron, which can be used for downstream analysis, such as computing nucleotide diversity, heterozygosity, dN/dS, piN/piS, or neutral index. 
+ (1) File MapFile.AllSites.map is useful for extracting sequences, such as CDSs, exon, intron, which can be used for downstream analysis, such as computing nucleotide diversity, heterozygosity, dN/dS, piN/piS, or neutral index. 
  (2) Because mapgd does not check the reference genome sequence and it does not fill in the reference/major/minor sequences that are absent in the input mpileup file but fill them with "Ns" instead, an an end user must check the reference genome sequence and fill in the reference/major/minor sequence that are absent in the .map file. 
  
  You may check the reference genome sequence and fill in the reference/major/minor sequence using the following programs:
@@ -102,6 +102,6 @@ Fis: computed Inbreeding coefficient, should be same as F_STAT reported by mapgd
 		
 (4) To comput dN/dS: using these.txt5 files to compute dN/dS by CalculatedNdS.pl, a perl program written by Zhiqiang Ye.
 
-		CalculatedNdS.pl <input/output/dir>
+		CalculatedNdS.pl <input/dir> <Output/File/Name>
 
 Please send email to ouqd@hotmail.com if you find bugs or have any questions or suggestions, thanks!.
