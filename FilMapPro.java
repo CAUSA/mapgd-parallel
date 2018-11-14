@@ -3,15 +3,15 @@ import java.io.*;
 import java.util.Arrays;
 
 public class FilMapPro{
-	public static String Error1 ; //Error rate
-	public static String Error2 ; //Error rate
+	public static String Alpha1 ; //Confidence interval for PLR test
+	public static String Alpha2 ; //Confidence interval for Mm test
 	public static double MinPLR = 0; //Min likelyhood polymorphic
-	public static double MinHLR = 0; //Min chi-square of M:m ratio 
-	public static int MinC = 0; //Min Cov
-	public static int MaxC = 0; //Max Cov
-	public static String WD ;
-	public static String MapFile;	
-	public static String ProFile;
+	public static double MinChiSquare = 0; //Min chi-square of M:m ratio 
+	public static int MinC = 0; //Min population coverage
+	public static int MaxC = 0; //Max population coverage
+	public static String WD ; // Working directory
+	public static String MapFile; //Clean .map file
+	public static String ProFile; //Clean .pro file
 
 public static void main(String[] args)
 {
@@ -20,15 +20,15 @@ public static void main(String[] args)
 	int nTotal=0;
 	int nPolymorphic=0;
 	int nFiltered=0;
-	int nBadSites=0;
+	int nInSignificant=0;
 	int nMmBiased=0;
 	int nLowCov=0;
 	int nHighCov=0;
-	int	nFilteredCov=0;
+	int	nGoodCov=0;
 	int nMmBiasedSig=0;
 	int nLowCovSig=0;
 	int nHighCovSig=0;
-	int	nFilteredCovSig=0;
+	int	nGoodCovSig=0;
 	int nF1=0;
 	int nF2=0;
 	int nF3=0;
@@ -66,8 +66,8 @@ public static void main(String[] args)
 	String EF_CHRMstr	 ="";
 	String IND_INCstr	 ="";
 	String IND_CUTstr	 ="";
-	String REF_BIASstr 	 ="";
-	String P_REF_BSstr 	 ="";
+	String MJ_BIASstr 	 ="";
+	String P_MJ_BSstr 	 ="";
 	String BEST_LLstr	 ="";
 
 	int    Cov = 0 ; //Cov
@@ -87,15 +87,15 @@ public static void main(String[] args)
 	double EF_CHRM = 0.0; // 
 	double IND_INC = 0.0; // 
 	double IND_CUT = 0.0; // 
-	double REF_BIAS= 0.0;
-	double P_REF_BS= 0.0;
+	double MJ_BIAS= 0.0;
+	double P_MJ_BS= 0.0;
 	double BEST_LL = 0.0; // 
-	double HLR = 0.0;
-	int isFilteredSite=0;
+	double ChiSquare = 0.0;
+	int isGoodSite=0;
 	
 	String group="";
 	String Pstr ="";
-	String HLRstr ="";
+	String ChiSquarestr ="";
 	String Hstr ="";
 	String piStr ="";
 	String FisStr =""; // Inbreeding Coefficient estimate
@@ -128,16 +128,20 @@ try
 	
 	BufferedReader brPro = new BufferedReader(new InputStreamReader(new BufferedInputStream(new FileInputStream(new File(FilMapPro.ProFile))),"utf-8"),5*1024*1024); // reading file using 5M buffer
 	
-	String fFilter="e-"+FilMapPro.Error1+"-E-"+FilMapPro.Error2+"-C-"+FilMapPro.MinC+"-"+FilMapPro.MaxC;	
-	String fFileName = FilMapPro.MapFile.substring(0, FilMapPro.MapFile.indexOf(".map.map"));
-	String fAllSites = fFileName+".AllSites-"+fFilter+".map";
-	String fFiltered = fFileName+".Filtered-"+fFilter+".map";
+	String fFilter="e-"+FilMapPro.Alpha1+"-E-"+FilMapPro.Alpha2+"-C-"+FilMapPro.MinC+"-"+FilMapPro.MaxC;	
+	String fFileName = FilMapPro.MapFile.substring(0, FilMapPro.MapFile.indexOf(".map"));
+	String fAll = fFileName+".AllSites-"+fFilter+".map";
+	String fPolymorphic = fFileName+".Filtered-"+fFilter+".map";
+	
+	//String fDimorphic = fFileName+".Dimorphic-"+fFilter+".map";
 	
 	
-	BufferedWriter bwfAllSites = new BufferedWriter(new OutputStreamWriter( new BufferedOutputStream(new FileOutputStream(new File(fAllSites))),"utf-8"),1024*1024); // Writing file using 1M buffer 
+	BufferedWriter bwfAll = new BufferedWriter(new OutputStreamWriter( new BufferedOutputStream(new FileOutputStream(new File(fAll))),"utf-8"),1024*1024); // Writing file using 1M buffer 
 		
-	BufferedWriter bwfFiltered = new BufferedWriter(new OutputStreamWriter( new BufferedOutputStream(new FileOutputStream(new File(fFiltered))),"utf-8"),1024*1024); // Writing file using 1M buffer 
-			
+	BufferedWriter bwfPolymorphic = new BufferedWriter(new OutputStreamWriter( new BufferedOutputStream(new FileOutputStream(new File(fPolymorphic))),"utf-8"),1024*1024); // Writing file using 1M buffer 
+		
+	//BufferedWriter bwfDimorphic = new BufferedWriter(new OutputStreamWriter( new BufferedOutputStream(new FileOutputStream(new File(fDimorphic))),"utf-8"),1024*1024); // Writing file using 1M buffer 
+	
 	String headline="";
 	
 	headline+="Sca\t"; 
@@ -162,20 +166,20 @@ try
 	headline+="EF_CHRM\t" ; 
 	headline+="IND_INC\t" ; 
 	headline+="IND_CUT\t" ; 
-	headline+="REF_BIAS\t" ; 
-	headline+="P_REF_BS\t" ; 
+	headline+="MJ_BIAS\t" ; 
+	headline+="P_MJ_BS\t" ; 
 	headline+="BEST_LL\t" ; 
 	          
 //additional columns
 	headline+="group\t";			
 	headline+="P\t";
-	headline+="HLR\t";
+	headline+="ChiSquare\t";
 	headline+="pi\t";
 	headline+="H\t";
 	headline+="Fis\n";
 
-	bwfAllSites.write(headline);
-	bwfFiltered.write(headline);
+	bwfAll.write(headline);
+	bwfPolymorphic.write(headline);
 	lineMap=brMap.readLine();
 	linePro=brPro.readLine();
 	
@@ -280,7 +284,7 @@ try
 			S = Integer.parseInt(b[0].substring(9)); //S
 			L = Integer.parseInt(b[1]); //Position
 			
-			isFilteredSite=0;
+			isGoodSite=0;
 
 			if (b.length==25) 
 			{
@@ -304,8 +308,8 @@ try
 				EF_CHRMstr	= b[19];
 				IND_INCstr	= b[20];
 				IND_CUTstr	= b[21];
-				REF_BIASstr = b[22];
-				P_REF_BSstr = b[23];
+				MJ_BIASstr = b[22];
+				P_MJ_BSstr = b[23];
 				BEST_LLstr	= b[24];
 
 				Cov			= Integer.parseInt(b[5]) ;  
@@ -325,8 +329,8 @@ try
 				EF_CHRM 	= Double.parseDouble(b[19]);
 				IND_INC 	= Double.parseDouble(b[20]);
 				IND_CUT 	= Double.parseDouble(b[21]);
-				REF_BIAS 	= Double.parseDouble(b[22]);
-				P_REF_BS 	= Double.parseDouble(b[23]);
+				MJ_BIAS 	= Double.parseDouble(b[22]);
+				P_MJ_BS 	= Double.parseDouble(b[23]);
 				BEST_LL 	= Double.parseDouble(b[24]);
 				
 				if (MJ_FREQ==0){MJ_FREQ=1.0;}//Major frequency
@@ -343,19 +347,19 @@ try
 				int IndMin="ACGT".indexOf(Min);
 				int M=0; //Count of major type reads
 				int N=0; //Count of minor type reads
-				HLR=9999.9;
+				ChiSquare=9999.9;
 				if(IndMaj>=0&&IndMaj<=3&&IndMin>=0&&IndMin<=3)
 				{	
 					for(int j=0;j<100;j++)
 					{
-						if (quarters[j][IndMaj]>1&&quarters[j][IndMin]>1)
+						if (quarters[j][IndMaj]>0&&quarters[j][IndMin]>0)
 						{
 							M+=quarters[j][IndMaj];
 							N+=quarters[j][IndMin];
 						}
 					}	
 					double m=(M+N)/2; //mean of the count of M and N
-					HLR = ((M-m)*(M-m)+(N-m)*(N-m))/m;
+					ChiSquare = ((M-m)*(M-m)+(N-m)*(N-m))/m;
 				}
 				
 				if(P>0.0) 
@@ -363,28 +367,26 @@ try
 					nPolymorphic++;
 					if(Cov<FilMapPro.MinC){nLowCov++;}
 					if(Cov>FilMapPro.MaxC){nHighCov++;}
-					if(Cov>=FilMapPro.MinC&&Cov<=FilMapPro.MaxC){nFilteredCov++;}
-					if(HLR>=FilMapPro.MinHLR){nMmBiased++;}
-					if(F<=-0.33){nF1++;} else {nF2++;}
-					if(PLR<FilMapPro.MinPLR){nBadSites++;}	
+					if(Cov>=FilMapPro.MinC&&Cov<=FilMapPro.MaxC){nGoodCov++;}
+					if(ChiSquare>=FilMapPro.MinChiSquare){nMmBiased++;}
+					if(PLR<FilMapPro.MinPLR){nInSignificant++;}	
 					else
 					{
 						if(Cov<FilMapPro.MinC){nLowCovSig++;}
 						if(Cov>FilMapPro.MaxC){nHighCovSig++;}
 						if(Cov>=FilMapPro.MinC&&Cov<=FilMapPro.MaxC)
 						{
-							nFilteredCovSig++;
-							if(HLR>=FilMapPro.MinHLR)
+							nGoodCovSig++;
+							if(ChiSquare>=FilMapPro.MinChiSquare)
 							{
 								nMmBiasedSig++;
-								if(F<=-0.33){nF3++;} else {nF4++;}
 							}
 						}
 					}
 				}				
-				if(P>0.0&&PLR>=FilMapPro.MinPLR&&HLR<FilMapPro.MinHLR&&Cov>=FilMapPro.MinC&&Cov<=FilMapPro.MaxC) 
+				if(P>0.0&&PLR>=FilMapPro.MinPLR&&ChiSquare<FilMapPro.MinChiSquare&&Cov>=FilMapPro.MinC&&Cov<=FilMapPro.MaxC) 
 				{
-					isFilteredSite=1;
+					isGoodSite=1;
 					nFiltered++;
 				}
 				else
@@ -397,8 +399,8 @@ try
 				}
 				group	= String.valueOf(Math.round(P*100)/100.0);
 				Pstr	= String.valueOf(Math.round(P*10000)/10000.0);
-				HLRstr	= String.valueOf(Math.round(HLR*10000)/10000.0);
-				if(HLRstr.equals("9999.9")){HLRstr=".";}
+				ChiSquarestr	= String.valueOf(Math.round(ChiSquare*10000)/10000.0);
+				if(ChiSquarestr.equals("9999.9")){ChiSquarestr="0.0";}
 				piStr	= String.valueOf(Math.round(pi*10000)/10000.0);
 				Hstr	= String.valueOf(Math.round(H*10000)/10000.0);
 				FisStr	= String.valueOf(Math.round(F*10000)/10000.0);
@@ -427,55 +429,53 @@ try
 			OStr+=EF_CHRMstr+"\t" ; 
 			OStr+=IND_INCstr+"\t" ; 
 			OStr+=IND_CUTstr+"\t" ; 
-			OStr+=REF_BIASstr+"\t" ; 
-			OStr+=P_REF_BSstr+"\t" ; 
+			OStr+=MJ_BIASstr+"\t" ; 
+			OStr+=P_MJ_BSstr+"\t" ; 
 			OStr+=BEST_LLstr+"\t" ; 
 		
 		//additional columns
 			OStr+=group+"\t";			
 			OStr+=Pstr+"\t";
-			OStr+=HLRstr+"\t";
+			OStr+=ChiSquarestr+"\t";
 			OStr+=piStr+"\t";
 			OStr+=Hstr+"\t";
 			OStr+=FisStr+"\n";
 			
-			OStr=OStr.replaceAll("\t0.0\t", "\t.\t");
+			bwfAll.write(OStr);
 			
-			bwfAllSites.write(OStr);
-			
-			if (isFilteredSite>0)
+			if (isGoodSite>0)
 			{
-				bwfFiltered.write(OStr);	
+				bwfPolymorphic.write(OStr);	
 			}
 		}
 	} //end while
 	
-	bwfAllSites.close();
-	bwfFiltered.close();
+	bwfAll.close();
+	bwfPolymorphic.close();
 	
 	System.out.print("Results were saved in files:\n");
-	System.out.print(fAllSites+"\n");
-	System.out.print(fFiltered+"\n");
+	System.out.print(fAll+"\n");
+	System.out.print(fPolymorphic+"\n");
+	//System.out.print(fDimorphic+"\n");
 	
 	String fOut = fFileName+"-"+fFilter+"-out.txt";
 	BufferedWriter bwfOut = new BufferedWriter(new OutputStreamWriter( new BufferedOutputStream(new FileOutputStream(new File(fOut))),"utf-8"),10*1024); // Writing file using 1M buffer 
 	
-	bwfOut.write(fFiltered+"\n");
-	bwfOut.write("All sites: "+nTotal+"\n");
-	bwfOut.write("Polymorphic (MAF>0.0): "+nPolymorphic+"\n");
+	bwfOut.write(fPolymorphic+"\n");
+	bwfOut.write("Filtering conditions: MAF>0.0, Coverage: Cov="+FilMapPro.MinC+"-"+FilMapPro.MaxC+"), significant: PLR>="+FilMapPro.MinPLR+", and not M/m biased: M:m chi-square<"+FilMapPro.MinChiSquare+"\n");
+	bwfOut.write("Total sites: "+nTotal+"\n");
+	bwfOut.write("Polymorphic: "+nPolymorphic+"\n");
+	bwfOut.write("Significant: "+nFiltered+"\n");
+	bwfOut.write("Insignificant: "+nInSignificant+"\n");
 	bwfOut.write("Filtered Sites:"+nFiltered+"\n");
-	bwfOut.write("Filtered sites: Filtered coverage (Cov="+FilMapPro.MinC+"-"+FilMapPro.MaxC+"), significantly polymorphic(PLR>="+FilMapPro.MinPLR+") and not M/m biased (M:m chi-square<"+FilMapPro.MinHLR+"\n");
-	bwfOut.write("Bad Sites: "+nBadSites+"\n");
 	bwfOut.write("Cov<"+FilMapPro.MinC+"&significant: "+nLowCovSig+"\n");
 	bwfOut.write("Cov>"+FilMapPro.MaxC+"&significant: "+nHighCovSig+"\n");
 	bwfOut.write("Cov<"+FilMapPro.MinC+"&insignificant: "+nLowCov+"\n");
 	bwfOut.write("Cov>"+FilMapPro.MaxC+"&insignificant: "+nHighCov+"\n");
-	bwfOut.write("Cov="+FilMapPro.MinC+"-"+FilMapPro.MaxC+"&significant: "+nFilteredCovSig+"\n");
-	bwfOut.write("Cov="+FilMapPro.MinC+"-"+FilMapPro.MaxC+"&insignificant: "+nFilteredCov+"\n");
+	bwfOut.write("Cov="+FilMapPro.MinC+"-"+FilMapPro.MaxC+"&significant: "+nGoodCovSig+"\n");
+	bwfOut.write("Cov="+FilMapPro.MinC+"-"+FilMapPro.MaxC+"&insignificant: "+nGoodCov+"\n");
 	bwfOut.write("M/m biased&significant: "+nMmBiasedSig+"\n");	
 	bwfOut.write("M/m biased&insignificant: "+nMmBiased+"\n");	
-	bwfOut.write("F>-0.33: "+nF3+"\n");
-	bwfOut.write("F<=-0.33: "+nF4+"\n");
 	bwfOut.close();
 }
 catch(Exception e)
@@ -552,7 +552,7 @@ public static int CheckInputArgs(String argstr)
 	//System.out.print("-m:"+m1+" "+m2+" "+m3+"\n");
 	if (m1<0||m2<0||m3<0) 
 	{
-		System.out.print("Please input the .clean.map file, for example: PA.clean.map.map.\n");
+		System.out.print("Please input the .clean.map file, for example: PA.clean.map.\n");
 		InputErrors++;
 	}
 	
@@ -565,26 +565,26 @@ public static int CheckInputArgs(String argstr)
 	
 	if(InputErrors>=1) {	System.exit(1);	}
 	
-	FilMapPro.Error1 = argstr.substring(e2,e3).trim(); //Error rate
-	FilMapPro.Error2 = argstr.substring(E2,E3).trim(); //Error rate
+	FilMapPro.Alpha1 = argstr.substring(e2,e3).trim(); //Error rate
+	FilMapPro.Alpha2 = argstr.substring(E2,E3).trim(); //Error rate
 	FilMapPro.MinPLR = 0; //Min likelyhood polymorphic
-	FilMapPro.MinHLR = 0; //Min chi-square of major:minor ratio 
+	FilMapPro.MinChiSquare = 0; //Min chi-square of major:minor ratio 
 	
-	//System.out.print("Error rate for polymorphic likelyhood test: "+FilMapPro.Error1+"\n");
+	//System.out.print("Error rate for polymorphic likelyhood test: "+FilMapPro.Alpha1+"\n");
 	
-	if (FilMapPro.Error1.indexOf("0.05")>=0)
+	if (FilMapPro.Alpha1.indexOf("0.05")>=0)
 	{
 		FilMapPro.MinPLR = 5.991; 
 	}
 	else
 	{
-		if (FilMapPro.Error1.indexOf("0.01")>=0)
+		if (FilMapPro.Alpha1.indexOf("0.01")>=0)
 		{
 			FilMapPro.MinPLR = 9.21; 
 		}
 		else
 		{
-			if (FilMapPro.Error1.indexOf("0.001")>=0)
+			if (FilMapPro.Alpha1.indexOf("0.001")>=0)
 			{
 				FilMapPro.MinPLR = 13.82; 
 			}
@@ -597,22 +597,22 @@ public static int CheckInputArgs(String argstr)
 	}
 	//System.out.print("Polymorphic likelyhood ratio >="+FilMapPro.MinPLR+"\n ");
 
-	//System.out.print("Error rate for heterozygotes M:m ratio test:"+FilMapPro.Error2+"\n");
-	if (FilMapPro.Error2.indexOf("0.05")>=0)
+	//System.out.print("Error rate for heterozygotes M:m ratio test:"+FilMapPro.Alpha2+"\n");
+	if (FilMapPro.Alpha2.indexOf("0.05")>=0)
 	{
-		FilMapPro.MinHLR = 3.841; 
+		FilMapPro.MinChiSquare = 3.841; 
 	}
 	else
 	{
-		if (FilMapPro.Error2.indexOf("0.01")>=0)
+		if (FilMapPro.Alpha2.indexOf("0.01")>=0)
 		{
-			FilMapPro.MinHLR = 6.64; 
+			FilMapPro.MinChiSquare = 6.64; 
 		}
 		else
 		{
-			if (FilMapPro.Error2.indexOf("0.001")>=0)
+			if (FilMapPro.Alpha2.indexOf("0.001")>=0)
 			{
-				FilMapPro.MinHLR = 10.83; 
+				FilMapPro.MinChiSquare = 10.83; 
 			}
 			else
 			{
@@ -622,7 +622,7 @@ public static int CheckInputArgs(String argstr)
 		}
 	}
 	
- 	//System.out.print("Chi-square<"+FilMapPro.MinHLR+"\n ");
+ 	//System.out.print("Chi-square<"+FilMapPro.MinChiSquare+"\n ");
 
 	String Cov1 = argstr.substring(c2,c3).trim(); //Error rate
 	String Cov2 = argstr.substring(C2,C3).trim(); //Error rate
@@ -657,11 +657,11 @@ public static int CheckInputArgs(String argstr)
 	FilMapPro.MapFile = FilMapPro.WD+"/"+argstr.substring(m2,m3).trim();	
 	FilMapPro.ProFile = FilMapPro.WD+"/"+argstr.substring(p2,p3).trim();
 	
-	int i1 = FilMapPro.MapFile.toLowerCase().indexOf(".clean.map.map");	
+	int i1 = FilMapPro.MapFile.toLowerCase().indexOf(".clean.map");	
 	int i2 = FilMapPro.ProFile.toLowerCase().indexOf(".clean.pro"); 	                       			
 	if(i1<0)
 	{
-		System.out.println(FilMapPro.MapFile+"<--The map must be a .clean.map.map file:\n");
+		System.out.println(FilMapPro.MapFile+"<--The map must be a .clean.map file:\n");
 		InputErrors++;
 	}
 	
@@ -670,31 +670,32 @@ public static int CheckInputArgs(String argstr)
 		System.out.println(FilMapPro.ProFile+"<--The pro must be a .clean.pro file:\n");
 		InputErrors++;
 	}
-	
-	File mfile = new File(FilMapPro.MapFile);	
-	File pfile = new File(FilMapPro.ProFile);	
-	
-	if(!mfile.exists())
+	if (i1>0&&i2>0)
 	{
-		System.out.println(FilMapPro.MapFile+"<--The .map file is not found!\n");
-		InputErrors++;
-	}
-	
-	if(!pfile.exists())
-	{
-		System.out.println(FilMapPro.ProFile+"<--The .pro file is not found!\n");
-		InputErrors++;
-	}
-	
-	String f1=FilMapPro.MapFile.substring(0,i1);
-	String f2=FilMapPro.MapFile.substring(0,i1);
-
-	if(!f1.equals(f2))
-	{
-		System.out.println("The .map file does not match the .pro file!\n");
-		InputErrors++;
-	}
+		File mfile = new File(FilMapPro.MapFile);	
+		File pfile = new File(FilMapPro.ProFile);	
 		
+		if(!mfile.exists())
+		{
+			System.out.println(FilMapPro.MapFile+"<--The .map file is not found!\n");
+			InputErrors++;
+		}
+		
+		if(!pfile.exists())
+		{
+			System.out.println(FilMapPro.ProFile+"<--The .pro file is not found!\n");
+			InputErrors++;
+		}
+		
+		String f1=FilMapPro.MapFile.substring(0,i1);
+		String f2=FilMapPro.MapFile.substring(0,i1);
+
+		if(!f1.equals(f2))
+		{
+			System.out.println("The .map file does not match the .pro file!\n");
+			InputErrors++;
+		}
+	}	
 	return InputErrors;
 	
 }
