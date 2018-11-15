@@ -384,7 +384,7 @@ try
 						}
 					}
 				}				
-				if(P>0.0&&PLR>=FilMapPro.MinPLR&&ChiSquare<FilMapPro.MinChiSquare&&Cov>=FilMapPro.MinC&&Cov<=FilMapPro.MaxC) 
+				if(P>0.0&&((PLR>=FilMapPro.MinPLR&&ChiSquare<FilMapPro.MinChiSquare)||PLR>=FilMapPro.MinPLR)&&Cov>=FilMapPro.MinC&&Cov<=FilMapPro.MaxC) 
 				{
 					isGoodSite=1;
 					nFiltered++;
