@@ -62,11 +62,12 @@ try
 	
 			//Minor allele frequencies (MAF)
 			if(b[31].equals(".")){b[31]="0.0";	}	
-			double MAF = Double.parseDouble(b[31]); //MAF:	
-			double Fis = Double.parseDouble(b[35]); //MAF:	
+			double GOF = Double.parseDouble(b[18]); 	
+			double MAF = Double.parseDouble(b[31]); 	
+			double Fis = Double.parseDouble(b[35]); 	
 			String p="1.0000";
 			String q="0.0000";			
-			if(Fis>0.0)
+			if(Fis>0.0&&GOF>-2.0)
 			{
 				p=String.valueOf(Math.round((1-MAF)*10000)/10000.0);
 				q=String.valueOf(Math.round(MAF*10000)/10000.0);
